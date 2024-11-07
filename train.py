@@ -8,17 +8,21 @@ train_dataset=[]
 val_dataset=[]
 
 tf = open("/mnt/HDD/yangzhenyu/llama-main/data/train.txt") # 返回一个文件对象
+tfgraph = open("/mnt/HDD/yangzhenyu/llama-main/data/graph_train.txt") # 返回一个文件对象
 line = tf.readline()
-while line:
-    en,ch,_=line.split("	")
-    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ en + '\nOutput:'+ ch + '</s>'})
+for i in range(len(line)):
+    patch,result,_=line[i].split("	")
+    train_graph = tfgraph[i]
+    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result + '</s>',"graph":train_graph})
     line = tf.readline()
 tf.close()
 ef = open("/mnt/HDD/yangzhenyu/llama-main/data/eval.txt") # 返回一个文件对象
+tfgraph = open("/mnt/HDD/yangzhenyu/llama-main/data/graph_eval.txt") # 返回一个文件对象
 line = ef.readline()
-while line:
-    en,ch,_=line.split("	")
-    val_dataset.append({'text': 'Translate English to chinese:\nInput:'+ en + '\nOutput:'+ ch + '</s>'})
+for i in range(len(line)):
+    patch,result,_=line.split("	")
+    val_graph = tfgraph[i]
+    val_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result +'</s>',"graph":eval_graph})
     line = ef.readline()
 ef.close()
 train_dataset = Dataset.from_dict({key: [dic[key] for dic in train_dataset] for key in train_dataset[0]})
