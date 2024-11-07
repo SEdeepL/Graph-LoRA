@@ -71,10 +71,12 @@ python test.py
 ```
 ### RQ2
 In the ablation experiment, the codes of three submodules are gradually deleted: (1) Attention, (2) Graph-LoRA, and (3) APSG.
+```
 ├──whole model
   ├──(1)peft/tuners/lora/layer.py line589->result_fuse=graph+result_down
   ├──(2)peft/tuners/lora/layer.py line588-590 -> result=result+lora_B(lora_A(dropout(x)))
   ├──(3)train.py line 16 ->    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result + '</s>'})
+```
 ### RQ3
 First generate a cross-project dataset
 ```
