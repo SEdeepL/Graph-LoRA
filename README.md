@@ -45,14 +45,11 @@ Our code is written based on the Peft package. Here we only describe the files r
 ## Main code introduction
 In order to allow readers to read the code of our model more accurately, we briefly introduce the main codes corresponding to the model structure.
 
-The Graph-LoRA model mainly consists of three modules: (1)Attention, (2)Graph, (3)Graph-LoRA.
-* (1) NARRepair model: the code to implement the NARRepair model is the NARRepair class in the NARRepair/narrepair/models/narrepair.py file
-* (2) Code Encoder: this module will use the encoder part of the transformers model that comes with fairseq. Implemented in the NATransformerEncoder class in the fairseq/models/nat/narrepair_nonautoregressive_transformer file.
-* (3) Repair Action Predictor: Implemented in the DurationPredictor class in the fairseq/models/nat/narrepair_nonautoregressive_transformer file.
-* (4) Inter-word Dependency Extractor:Implemented in the Biaffine class and ast_link function in the fairseq/models/nat/narrepair_nonautodegrasive_transformer file.
-* (5) Two-stage Decoder：Implemented in the NATransformerDecoder class in the fairseq/models/nat/narrepair_nonautoregressive_transformer file.
+The Graph-LoRA model mainly consists of three modules: (1)Graph, (2)Attention, (3)Graph-LoRA.
+* (1) Graph: this module will get APSG features. Implemented in the GCNWithSubgraphs class in the peft/tuners/lora/graph.py file.
+* (2)Attention: this module will fuse APSG features and text features. Implemented the Attention is the MultiHeadAttention class in the peft/tuners/lora/attention.py file
+* (3) Graph-LoRA: this module will efficient-parameter tuning for LLM. Implemented in the Linear class in the peft/tuners/lora/layer.py file.
 ## Preprocess
-Preprocessing is divided into two steps: (1) Obtain the repair actions of the training data (2) Convert the data into binary files.
+Preprocessing the APSG is divided into two steps: (1) Obtaining the Semantic Graph of patch  (2) Adding node attributes.
 ### Obtain the repair actions
-We divide all repair actions into: "insert", "delete", "replace", "keep". And we use dynamic programming method to obtain repair actions.
 ```
