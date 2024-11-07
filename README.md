@@ -50,6 +50,38 @@ The Graph-LoRA model mainly consists of three modules: (1)Graph, (2)Attention, (
 * (2)Attention: this module will fuse APSG features and text features. Implemented the Attention is the MultiHeadAttention class in the peft/tuners/lora/attention.py file
 * (3) Graph-LoRA: this module will efficient-parameter tuning for LLM. Implemented in the Linear class in the peft/tuners/lora/layer.py file.
 ## Preprocess
-Preprocessing the APSG is divided into two steps: (1) Obtaining the Semantic Graph of patch  (2) Adding node attributes.
-### Obtain the repair actions
+Preprocessing the APSG is divided into two steps: (1) Obtaining the Semantic Graph of patch, (2) Adding node attributes.
+### Obtaining the Semantic Graph
+```
+javac APSG/semanticmodel/Activator.java
+python APSG/semanticmodel/graph.py
+```
+### Adding Node Attributes
+```
+bash attribute.sh
+```
+## Experiment
+Our implementation and evaluation are performed on an Ubuntu 22.04.5 server equipped with two
+RTX A6000 GPUs.
+### RQ1
+We train and test our model in a cross-validation manner on three datasets: Wang, Lin, and Balance.
+```
+python train.py
+python test.py
+```
+### RQ2
+In the ablation experiment, the codes of three submodules are gradually deleted: (1) Attention, (2) Graph-LoRA, and (3) APSG.
+├──whole model
+  ├──(1)peft/tuners/lora/layer.py line589->result_fuse=graph+result_down
+  ├──(2)peft/tuners/lora/layer.py line588-590 -> result=result+lora_B(lora_A(dropout(x)))
+  ├──(3)train.py line 16 ->    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result + '</s>'})
+### RQ3
+First generate a cross-project dataset
+```
+python cross-project.py
+```
+Train and test the model after specifying the dataset path
+```
+python train.py
+python test.py
 ```
