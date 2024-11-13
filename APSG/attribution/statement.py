@@ -1,4 +1,6 @@
 import re
+import os
+import sys
 
 def check_java_statements(java_code):
     # 赋值语句 (赋值运算符)
@@ -33,13 +35,28 @@ def check_java_statements(java_code):
         "Has Return Statement": has_return_statement
     }
 
-# 示例 Java 代码
-java_code = """
-"""
 
-# 检查 Java 代码中是否包含这些语句
-result = check_java_statements(java_code)
-
-# 输出检查结果
-for statement, found in result.items():
-    print(f"{statement}: {'包含' if found else '不包含'}")
+if __name__ == "__main__":
+    graph_file = sys.argv[1]
+    entries = os.listdir(graph_file)
+    subdirectories = [d for d in entries if os.path.isdir(os.path.join(graph_file, d))]
+    for file in subdirectories:
+        graph = open(file, 'r')
+        graph_line = graph.readline()
+        for index, value in enumerate(graph_line):
+            if value == "Graph Nodes and Related Information:":
+                nodes_index=index
+        for j in range(nodes_index,len(graph_line)):
+            if graph_line[j] == "Graph Edges:"
+                break
+            if graph_line[j].find("context"):
+                _,context= graph_line[j].split(":")
+            result = check_java_statements(context)
+            state=False
+            for statement, found in result.items():
+                
+                if found:
+                    state=True
+                    graph_line[j] = graph_line[j]+"operator:"+statement
+            if state==False:
+                graph_line[j] = graph_line[j]+"operator:"+"-1"
