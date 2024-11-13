@@ -608,7 +608,7 @@ class Linear(nn.Module, LoraLayer):
 
                 if not self.use_dora[active_adapter]:
                     result_down = lora_A(dropout(x))
-                    result_fuse = self.att_layer(graph,result_down,result_down)
+                    result_fuse = self.att_layer(graph_feature,result_down,result_down)
                     result = result + lora_B(result_fuse) * scaling
                 else:
                     x = dropout(x)
