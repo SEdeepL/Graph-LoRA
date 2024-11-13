@@ -1,5 +1,6 @@
 import re
-
+import os
+import sys
 def categorize_operators(java_code):
     # 一元运算符 (Unary Operators)
     unary_operators = [
@@ -47,25 +48,30 @@ def categorize_operators(java_code):
     
     return result
 
-# 示例 Java 代码
-java_code = """
-public class Example {
-    public static void main(String[] args) {
-        int a = 5;
-        int b = 10;
-        boolean result = (a < b) && (b > 0);
-        a++;
-        if (a == b) {
-            System.out.println("Equal");
-        }
-        result = !result;
-    }
-}
-"""
 
-# 检查 Java 代码中是否包含运算符
-operator_types = categorize_operators(java_code)
 
-# 输出结果
-for operator_type, found in operator_types.items():
-    print(f"{operator_type}: {'包含' if found else '不包含'}")
+if __name__ == "__main__":
+    graph_file = sys.argv[1]
+    entries = os.listdir(graph_file)
+    subdirectories = [d for d in entries if os.path.isdir(os.path.join(graph_file, d))]
+    for file in subdirectories:
+        graph = open(file, 'r')
+        graph_line = graph.readline()
+        for index, value in enumerate(graph_line):
+            if value == "Graph Nodes and Related Information:":
+                nodes_index=index
+        for j in range(nodes_index,len(graph_line)):
+            if graph_line[j] == "Graph Edges:"
+                break
+            if graph_line[j].find("context"):
+                _,context= graph_line[j].split(":")
+            operator_types = categorize_operators(context)
+            operat=False
+            for operator_type, found in operator_types.items():
+                # print(f"{operator_type}: {'包含' if found else '不包含'}")
+                
+                if found:
+                    operat=True
+                    graph_line[j] = graph_line[j]+"operator:"+operator_type
+            if operat==False:
+                graph_line[j] = graph_line[j]+"operator:"+"-1"
