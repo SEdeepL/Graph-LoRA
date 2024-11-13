@@ -559,11 +559,33 @@ class Linear(nn.Module, LoraLayer):
 
         return output_tensor
 
-    def forward(self, x: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
+    def forward(self, x: torch.Tensor,  node: torch.Tensor, edge: torch.Tensor,*args: Any, **kwargs: Any) -> torch.Tensor:
         self._check_forward_args(x, *args, **kwargs)
         adapter_names = kwargs.pop("adapter_names", None)
         #ipdb.set_trace()
-
+        node_num = []
+        for num in node[-1]:
+            if num!=-1:
+                node_num.append(num)
+            else:
+                break
+        node = node[:-1]
+        edge_num=[]
+        sub_index =[]
+        edgen=edge[-1].reshape(-1)
+        for num in edgen:
+            if num!=-1:
+                edge_num.append(num)
+            else:
+                break
+        edgei=edge[-1].reshape(-1)
+        for num in edgei:
+            if num!=-1:
+                sub_index.append(num)
+            else:
+                break
+        edge = edge[:-2]
+        graph_feature = graph(node,edge,node_num,edge_num,sub_index)
         if self.disable_adapters:
             if self.merged:
                 self.unmerge()
