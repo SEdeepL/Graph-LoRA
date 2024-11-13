@@ -2,6 +2,7 @@ import os, sys, json, math
 from alpha_repair_code.model import *
 from os.path import *
 import torch
+from transformers import TrainingArguments, AutoModelForCausalLM, AutoTokenizer
 def extract_common_prefix_tokens(tokens_1:torch, tokens_2:torch):
     tokens_1 = tokens_1.to(lm.model.device)
     tokens_2 = tokens_2.to(lm.model.device)
@@ -10,9 +11,6 @@ def extract_common_prefix_tokens(tokens_1:torch, tokens_2:torch):
             return tokens_1[:i]
         
 def extract_common_prefix_str(output_str, target_str):
-    # target_str should have been stripped
-    print('DEBUG: output_str: ', output_str)
-    print('DEBUG: target_str: ', target_str)
     striped_output_str = output_str.lstrip() # remove leading spaces, tabs, newlines
     striped_str = output_str[:len(output_str) - len(striped_output_str)]
     for i in range(min(len(striped_output_str), len(target_str))):
@@ -93,8 +91,28 @@ def get_entropy(prefix:str, suffix:str, patch:str):
     scores = []
     get_scores(prefix_tokens, suffix_tokens, target_tokens, scores)
     scores = [score if score > 0 else MIN_SCORE for score in scores]
-    print('DEBUG: scores: ', scores)
     
     neg_logs = [-math.log(score) for score in scores]
     sum_entropy = sum(neg_logs)
     return sum_entropy
+if __name__ == "__main__":
+    model_name ='/mnt/yangzhenyu/codellama-hf/'
+    lm = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=torch.float16,
+        device_map='auto'
+    )
+    patch_file = sys.argv[1]
+    graph_file = sys.argv[2]
+    entries = os.listdir(graph_file)
+    subdirectories = [d for d in entries if os.path.isdir(os.path.join(graph_file, d))]
+    patch = open(patch_file, 'r')
+    patch_line = patch.readline()
+    for i in range(len(patch_line)):
+        prefix, patch,suffix = patch_line[i].split("<p>")
+        graph = open(graph_file+subdirectories[i], 'r')
+        graph_line = graph.readline()
+        entropy_score= get_entropy(prefix,suffix, patch)
+        for j in range(len(graph_line)):
+            if graph_line[j].find("patch"):
+                graph_line[j] = graph_line[j]+"entropy"+str(entropy_score)
