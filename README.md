@@ -60,7 +60,7 @@ python APSG/semanticmodel/graph.py
 ```
 ### Adding the Node Attributes
 ```
-bash attribute.sh
+bash APSG/semanticmodel/attribute.sh
 ```
 ## Experiment
 Our evaluation is performed on an Ubuntu 22.04.5 server equipped with two RTX A6000 GPUs.
