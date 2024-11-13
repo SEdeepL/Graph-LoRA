@@ -558,11 +558,7 @@ class Linear(nn.Module, LoraLayer):
             self.lora_B[adapter].weight.data = weight_B.to(dtype)
 
         return output_tensor
-
-    def forward(self, x: torch.Tensor,  node: torch.Tensor, edge: torch.Tensor,*args: Any, **kwargs: Any) -> torch.Tensor:
-        self._check_forward_args(x, *args, **kwargs)
-        adapter_names = kwargs.pop("adapter_names", None)
-        #ipdb.set_trace()
+    def processgraph():
         node_num = []
         for num in node[-1]:
             if num!=-1:
@@ -585,7 +581,21 @@ class Linear(nn.Module, LoraLayer):
             else:
                 break
         edge = edge[:-2]
-        graph_feature = graph(node,edge,node_num,edge_num,sub_index)
+        global_data = Data(x=node[:node_num[0]], edge_index=edge[0], batch=torch.zeros(node[:node_num[0]].size(0), dtype=torch.long))
+        subgraph_data_list = []
+        nodesum=1
+        for i in range(1,len(node_num)):
+            subgraph_batch = torch.zeros(node[:node_num[i].size(0), dtype=torch.long)
+            subgraph_data = Data(x=node[nodesum,nodesum+node_num[i]], edge_index=edge[i], batch=subgraph_batch, index = sub_index[i])
+            nodesum =nodesum+node_num[i]
+            subgraph_data_list.append(subgraph_data)
+        return subgraph_data_list, global_data
+    def forward(self, x: torch.Tensor,  node: torch.Tensor, edge: torch.Tensor,*args: Any, **kwargs: Any) -> torch.Tensor:
+        self._check_forward_args(x, *args, **kwargs)
+        adapter_names = kwargs.pop("adapter_names", None)
+        #ipdb.set_trace()
+        subgraph_data_list, global_data=processgraph(node,edge)
+        graph_feature = graph(subgraph_data_list, global_data)
         if self.disable_adapters:
             if self.merged:
                 self.unmerge()
