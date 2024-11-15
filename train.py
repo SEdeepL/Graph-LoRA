@@ -8,20 +8,28 @@ train_dataset=[]
 val_dataset=[]
 
 tf = open("/mnt/HDD/yangzhenyu/llama-main/data/train.txt") # 返回一个文件对象
-tfgraph = open("/mnt/HDD/yangzhenyu/llama-main/data/graph_train.txt") # 返回一个文件对象
+graph_train="/mnt/HDD/yangzhenyu/llama-main/data/graph_train"
+entries = os.listdir(graph_train)
+tfgraph = [d for d in entries if os.path.isdir(os.path.join(graph_train, d))]
 line = tf.readline()
 for i in range(len(line)):
     patch,result,_=line[i].split("	")
     train_graph = tfgraph[i]
-    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result + '</s>',"graph":train_graph})
+    graph =  open(graph_train+tfgraph[i])
+    graph_line = graph.readline()
+    train_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result + '</s>',"graph":graph_line})
     line = tf.readline()
 tf.close()
 ef = open("/mnt/HDD/yangzhenyu/llama-main/data/eval.txt") # 返回一个文件对象
-tfgraph = open("/mnt/HDD/yangzhenyu/llama-main/data/graph_eval.txt") # 返回一个文件对象
+graph_eval="/mnt/HDD/yangzhenyu/llama-main/data/graph_eval"
+entries = os.listdir(graph_train)
+efgraph = [d for d in entries if os.path.isdir(os.path.join(graph_eval, d))]
 line = ef.readline()
 for i in range(len(line)):
     patch,result,_=line.split("	")
-    val_graph = tfgraph[i]
+    val_graph = efgraph[i]
+    graph =  open(graph_train+efgraph[i])
+    graph_line = graph.readline()
     val_dataset.append({'text': 'Translate English to chinese:\nInput:'+ patch + '\nOutput:'+ result +'</s>',"graph":eval_graph})
     line = ef.readline()
 ef.close()
